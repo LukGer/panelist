@@ -1,6 +1,4 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Redirect, Stack } from "expo-router";
-import * as SplashScreen from "expo-splash-screen";
 import React from "react";
 import {
   Platform,
@@ -10,17 +8,20 @@ import {
   View,
 } from "react-native";
 
-import { authClient } from "@/auth/client";
+import { DatabaseProvider } from "@/components/database-provider";
 import LinkButton from "@/components/link-button";
-import DatabaseWrapper from "@/database/wrapper";
+import { AuthProvider } from "@/contexts/auth-context";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import {
   DarkTheme,
   DefaultTheme,
   ThemeProvider,
 } from "@react-navigation/native";
+import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import ErrorBoundary from "react-native-error-boundary";
+
+const queryClient = new QueryClient();
 
 const ErrorFallbackComponent = () => {
   return (
@@ -34,10 +35,7 @@ const ErrorFallbackComponent = () => {
   );
 };
 
-SplashScreen.preventAutoHideAsync();
-
 export default function RootLayout() {
-  const queryClient = new QueryClient();
   const colorScheme = useColorScheme();
   const isIOS = Platform.OS === "ios";
   const bgColor = useThemeColor({}, "background");
@@ -57,26 +55,17 @@ export default function RootLayout() {
               translucent={false}
             />
           )}
-          <App />
+          <DatabaseProvider>
+            <AuthProvider>
+              <Stack>
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen name="login" options={{ headerShown: false }} />
+                <Stack.Screen name="+not-found" />
+              </Stack>
+            </AuthProvider>
+          </DatabaseProvider>
         </ThemeProvider>
       </ErrorBoundary>
     </QueryClientProvider>
-  );
-}
-
-function App() {
-  const { data: session } = authClient.useSession();
-
-  if (!session) {
-    return <Redirect href="/login" />;
-  }
-
-  return (
-    <DatabaseWrapper>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-    </DatabaseWrapper>
   );
 }

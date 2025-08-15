@@ -20,5 +20,10 @@
   "workspaces": [
     "apps/*",
     "packages/*"
+  ],
+  "trustedDependencies": [
+    "es5-ext",
+    "esbuild",
+    "sharp"
   ]
 }

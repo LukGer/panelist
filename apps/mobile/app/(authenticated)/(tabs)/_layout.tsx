@@ -1,8 +1,15 @@
+import { authClient } from "@/auth/client";
+import { Tabs } from "@/components/tabs";
+import { Redirect } from "expo-router";
 import React from "react";
 
-import { Tabs } from "@/components/tabs";
-
 export default function TabLayout() {
+  const { data: session } = authClient.useSession();
+
+  if (!session) {
+    return <Redirect href="/login" />;
+  }
+
   return (
     <Tabs>
       <Tabs.Screen
