@@ -58,8 +58,14 @@ export default function RootLayout() {
           <DatabaseProvider>
             <AuthProvider>
               <Stack>
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                <Stack.Screen name="login" options={{ headerShown: false }} />
+                <Stack.Screen
+                  name="(authenticated)/(tabs)"
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name="(unauthenticated)/login/index"
+                  options={{ headerShown: false }}
+                />
                 <Stack.Screen name="+not-found" />
               </Stack>
             </AuthProvider>

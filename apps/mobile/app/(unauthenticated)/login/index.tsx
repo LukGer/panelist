@@ -1,6 +1,6 @@
 import { authClient } from "@/auth/client";
 import Button from "@/components/button";
-import { Text, View } from "react-native";
+import { ScrollView, Text } from "react-native";
 
 export default function LoginScreen() {
   const handleLogin = async () => {
@@ -11,10 +11,10 @@ export default function LoginScreen() {
   };
 
   return (
-    <View>
+    <ScrollView contentInsetAdjustmentBehavior="automatic">
       <Text>Login with Google</Text>
 
       <Button onPress={handleLogin}>Login</Button>
-    </View>
+    </ScrollView>
   );
 }

@@ -1,13 +1,18 @@
 import { authClient } from "@/auth/client";
+import { LoadingScreen } from "@/components/loading-screen";
 import { Tabs } from "@/components/tabs";
 import { Redirect } from "expo-router";
 import React from "react";
 
 export default function TabLayout() {
-  const { data: session } = authClient.useSession();
+  const { data: session, isPending } = authClient.useSession();
+
+  if (isPending) {
+    return <LoadingScreen message="Loading..." />;
+  }
 
   if (!session) {
-    return <Redirect href="/login" />;
+    return <Redirect href="/(unauthenticated)/login" />;
   }
 
   return (
