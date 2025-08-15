@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Stack } from "expo-router";
+import { Redirect, Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import React, { useEffect } from "react";
+import React from "react";
 import {
   Platform,
   SafeAreaView,
@@ -10,8 +10,9 @@ import {
   View,
 } from "react-native";
 
+import { authClient } from "@/auth/client";
 import LinkButton from "@/components/link-button";
-import { useDatabase } from "@/hooks/useDatabase";
+import DatabaseWrapper from "@/database/wrapper";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import {
   DarkTheme,
@@ -27,7 +28,7 @@ const ErrorFallbackComponent = () => {
       <View>
         <Text>Oops!</Text>
         <Text>An unexpected error occured.</Text>
-        <LinkButton href="/(login)">Try again</LinkButton>
+        <LinkButton href="/login">Try again</LinkButton>
       </View>
     </SafeAreaView>
   );
@@ -37,57 +38,45 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const queryClient = new QueryClient();
+  const colorScheme = useColorScheme();
+  const isIOS = Platform.OS === "ios";
+  const bgColor = useThemeColor({}, "background");
 
   return (
     <QueryClientProvider client={queryClient}>
-      <App />
+      <ErrorBoundary FallbackComponent={ErrorFallbackComponent}>
+        <ThemeProvider
+          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+        >
+          {isIOS ? (
+            <StatusBar style="auto" />
+          ) : (
+            <StatusBar
+              style="auto"
+              backgroundColor={bgColor}
+              translucent={false}
+            />
+          )}
+          <App />
+        </ThemeProvider>
+      </ErrorBoundary>
     </QueryClientProvider>
   );
 }
 
 function App() {
-  const colorScheme = useColorScheme();
-  const isIOS = Platform.OS === "ios";
-  const bgColor = useThemeColor({}, "background");
+  const { data: session } = authClient.useSession();
 
-  const { isSuccess: isInitialized, isLoading, error } = useDatabase();
-
-  useEffect(() => {
-    if (isInitialized) {
-      SplashScreen.hideAsync();
-    }
-  }, [isInitialized]);
-
-  if (isLoading) {
-    return null;
+  if (!session) {
+    return <Redirect href="/login" />;
   }
 
-  if (error) {
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text style={{ color: "red", textAlign: "center" }}>
-          Database Error: {error.message}
-        </Text>
-      </View>
-    );
-  }
   return (
-    <ErrorBoundary FallbackComponent={ErrorFallbackComponent}>
-      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-        {isIOS ? (
-          <StatusBar style="auto" />
-        ) : (
-          <StatusBar
-            style="auto"
-            backgroundColor={bgColor}
-            translucent={false}
-          />
-        )}
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="+not-found" />
-        </Stack>
-      </ThemeProvider>
-    </ErrorBoundary>
+    <DatabaseWrapper>
+      <Stack>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="+not-found" />
+      </Stack>
+    </DatabaseWrapper>
   );
 }

@@ -43,6 +43,9 @@
       "eas": {
         "projectId": "b4ab1d7a-726b-4b76-a11d-df5cb1fa67e8"
       }
+    },
+    "android": {
+      "package": "dev.lukger.panelist"
     }
   }
 }
