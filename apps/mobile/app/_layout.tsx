@@ -35,10 +35,38 @@ const ErrorFallbackComponent = () => {
   );
 };
 
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
+function RootLayoutContent() {
   const isIOS = Platform.OS === "ios";
   const bgColor = useThemeColor({}, "background");
+
+  return (
+    <>
+      {isIOS ? (
+        <StatusBar style="auto" />
+      ) : (
+        <StatusBar style="auto" backgroundColor={bgColor} translucent={false} />
+      )}
+      <DatabaseProvider>
+        <AuthProvider>
+          <Stack>
+            <Stack.Screen
+              name="(authenticated)/(tabs)"
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="(unauthenticated)/login/index"
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen name="+not-found" />
+          </Stack>
+        </AuthProvider>
+      </DatabaseProvider>
+    </>
+  );
+}
+
+export default function RootLayout() {
+  const colorScheme = useColorScheme();
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -46,30 +74,7 @@ export default function RootLayout() {
         <ThemeProvider
           value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
         >
-          {isIOS ? (
-            <StatusBar style="auto" />
-          ) : (
-            <StatusBar
-              style="auto"
-              backgroundColor={bgColor}
-              translucent={false}
-            />
-          )}
-          <DatabaseProvider>
-            <AuthProvider>
-              <Stack>
-                <Stack.Screen
-                  name="(authenticated)/(tabs)"
-                  options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                  name="(unauthenticated)/login/index"
-                  options={{ headerShown: false }}
-                />
-                <Stack.Screen name="+not-found" />
-              </Stack>
-            </AuthProvider>
-          </DatabaseProvider>
+          <RootLayoutContent />
         </ThemeProvider>
       </ErrorBoundary>
     </QueryClientProvider>

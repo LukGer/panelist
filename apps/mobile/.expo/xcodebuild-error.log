@@ -1,7 +1,0 @@
-** BUILD FAILED **
-
-
-The following build commands failed:
-	CpHeader /Users/lukasrideamigos/Library/Developer/Xcode/DerivedData/panelist-cizsocinmfjknabsfkuqrpohuzcw/Build/Products/Debug-iphonesimulator/ExpoSQLite/ExpoSQLite.framework/Headers/sqlite3.h /Users/lukasrideamigos/private/panelist/node_modules/expo-sqlite/ios/sqlite3.h (in target 'ExpoSQLite' from project 'Pods')
-	Building workspace panelist with scheme panelist and configuration Debug
-(2 failures)

@@ -4,7 +4,7 @@ import React, { createContext, ReactNode } from "react";
 import { Text, View } from "react-native";
 
 interface AuthContextType {
-  session: any;
+  session: Awaited<ReturnType<typeof authClient.useSession>>["data"];
   isLoading: boolean;
   error: Error | null;
 }

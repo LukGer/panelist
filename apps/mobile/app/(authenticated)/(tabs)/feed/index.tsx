@@ -38,7 +38,7 @@ export default function FeedScreen() {
             onChangeText: (event) => {
               handleSearch(event.nativeEvent.text);
             },
-            placeholder: "Search feeds and articles...",
+            placeholder: "Search feed...",
             autoCapitalize: "none",
           },
         }}
