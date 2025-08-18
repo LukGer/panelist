@@ -1,3 +1,4 @@
+import { authClient } from "@/auth/client";
 import * as Form from "@/components/ui/form";
 import { Rounded } from "@/components/ui/rounded";
 import { useAuth } from "@/contexts/auth-context";
@@ -59,6 +60,10 @@ export default function ProfileScreen() {
               {session?.user.email}
             </Form.Text>
           </Rounded>
+        </Form.Section>
+
+        <Form.Section title="Cookie">
+          <Form.Text selectable>{authClient.getCookie()}</Form.Text>
         </Form.Section>
 
         <AppearanceSection />

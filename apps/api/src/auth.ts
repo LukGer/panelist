@@ -1,7 +1,7 @@
-import { db } from "@/database/config";
 import { expo } from "@better-auth/expo";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { db } from "../database/config";
 
 export const auth = betterAuth({
   plugins: [expo()],

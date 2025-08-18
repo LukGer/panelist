@@ -13,7 +13,7 @@ export const useSubscribedEntries = () => {
   const fetchSubscribedEntries =
     async (): Promise<SubscribedEntriesResponse> => {
       const response = await makeAuthenticatedRequest(
-        `${process.env.EXPO_PUBLIC_API_BASE_URL}/api/entries/subscribed`
+        `${process.env.EXPO_PUBLIC_API_BASE_URL}/api/rss/subscribed/entries`
       );
 
       if (!response.ok) {
