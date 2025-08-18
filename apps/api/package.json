@@ -1,5 +1,5 @@
 {
-  "name": "api",
+  "name": "@panelist/api",
   "scripts": {
     "dev": "bun run --hot src/index.ts",
     "db:generate": "drizzle-kit generate",
@@ -10,7 +10,9 @@
   "dependencies": {
     "@better-auth/expo": "^1.3.6",
     "better-auth": "^1.3.6",
-    "hono": "^4.9.2"
+    "drizzle-orm": "^0.44.4",
+    "hono": "^4.9.2",
+    "postgres": "^3.4.4"
   },
   "devDependencies": {
     "@types/bun": "latest"

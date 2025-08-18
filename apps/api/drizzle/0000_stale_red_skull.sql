@@ -18,7 +18,6 @@ CREATE TABLE "entries" (
 --> statement-breakpoint
 CREATE TABLE "feeds" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"user_id" uuid NOT NULL,
 	"title" text NOT NULL,
 	"url" text NOT NULL,
 	"description" text,
@@ -30,14 +29,11 @@ CREATE TABLE "feeds" (
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "users" (
+CREATE TABLE "user_feeds" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"email" text NOT NULL,
-	"name" text,
-	"avatar_url" text,
-	"created_at" timestamp DEFAULT now() NOT NULL,
-	"updated_at" timestamp DEFAULT now() NOT NULL,
-	CONSTRAINT "users_email_unique" UNIQUE("email")
+	"user_id" text NOT NULL,
+	"feed_id" uuid NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "account" (
@@ -89,13 +85,14 @@ CREATE TABLE "verification" (
 );
 --> statement-breakpoint
 ALTER TABLE "entries" ADD CONSTRAINT "entries_feed_id_feeds_id_fk" FOREIGN KEY ("feed_id") REFERENCES "public"."feeds"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "feeds" ADD CONSTRAINT "feeds_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "user_feeds" ADD CONSTRAINT "user_feeds_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "user_feeds" ADD CONSTRAINT "user_feeds_feed_id_feeds_id_fk" FOREIGN KEY ("feed_id") REFERENCES "public"."feeds"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "account" ADD CONSTRAINT "account_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "session" ADD CONSTRAINT "session_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 CREATE INDEX "entries_feed_id_idx" ON "entries" USING btree ("feed_id");--> statement-breakpoint
 CREATE INDEX "entries_guid_idx" ON "entries" USING btree ("guid");--> statement-breakpoint
 CREATE INDEX "entries_pub_date_idx" ON "entries" USING btree ("pub_date");--> statement-breakpoint
 CREATE INDEX "entries_is_read_idx" ON "entries" USING btree ("is_read");--> statement-breakpoint
-CREATE INDEX "feeds_user_id_idx" ON "feeds" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "feeds_url_idx" ON "feeds" USING btree ("url");--> statement-breakpoint
-CREATE INDEX "email_idx" ON "users" USING btree ("email");
+CREATE INDEX "user_feeds_user_id_idx" ON "user_feeds" USING btree ("user_id");--> statement-breakpoint
+CREATE INDEX "user_feeds_feed_id_idx" ON "user_feeds" USING btree ("feed_id");

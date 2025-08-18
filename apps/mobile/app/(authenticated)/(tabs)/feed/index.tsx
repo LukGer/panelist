@@ -1,18 +1,21 @@
-import Container from "@/components/container";
+import RssFeedItem from "@/components/rss-feed-item";
+import { useSubscribedEntries } from "@/hooks/use-subscribed-entries";
 import { useThemeColor } from "@/hooks/useThemeColor";
+import * as AC from "@bacons/apple-colors";
 import { Stack } from "expo-router";
-import { useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  FlatList,
+  RefreshControl,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 export default function FeedScreen() {
-  const [searchQuery, setSearchQuery] = useState("");
   const backgroundColor = useThemeColor({}, "background");
-
-  const handleSearch = (text: string) => {
-    setSearchQuery(text);
-    // Implement your search logic here
-    console.log("Searching for:", text);
-  };
+  const query = useSubscribedEntries();
 
   return (
     <>
@@ -32,56 +35,78 @@ export default function FeedScreen() {
           contentStyle: {
             backgroundColor: backgroundColor,
           },
-          headerSearchBarOptions: {
-            placement: "stacked",
-            hideWhenScrolling: true,
-            onChangeText: (event) => {
-              handleSearch(event.nativeEvent.text);
-            },
-            placeholder: "Search feed...",
-            autoCapitalize: "none",
-          },
         }}
       />
-      <Container>
-        <View style={styles.feedItem}>
-          <Text style={styles.feedItemTitle}>Welcome to your Feed!</Text>
-          <Text style={styles.feedItemContent}>
-            This is where you&apos;ll see your personalized content and updates.
-          </Text>
-        </View>
-
-        <View style={styles.feedItem}>
-          <Text style={styles.feedItemTitle}>Sample Post</Text>
-          <Text style={styles.feedItemContent}>
-            This is an example of how your feed items will appear. You can
-            scroll through your content here.
-          </Text>
-        </View>
-
-        <View style={styles.feedItem}>
-          <Text style={styles.feedItemTitle}>Another Update</Text>
-          <Text style={styles.feedItemContent}>
-            More content will be displayed here as you interact with the app.
-          </Text>
-        </View>
-      </Container>
-
-      {/* Search Results */}
-      {searchQuery.length > 0 && (
-        <View style={styles.searchResults}>
-          <Text style={styles.searchResultsText}>
-            Searching for &quot;{searchQuery}&quot;...
-          </Text>
-          {/* Add your search results here */}
-        </View>
-      )}
+      <FeedList query={query} />
     </>
   );
 }
 
+function FeedList({ query }: { query: any }) {
+  const tintColor = useThemeColor({}, "primary");
+
+  if (query.isLoading && !query.data) {
+    return (
+      <View style={styles.centerContainer}>
+        <ActivityIndicator size="large" color={tintColor} />
+        <Text style={styles.loadingText}>Loading your feed...</Text>
+      </View>
+    );
+  }
+
+  if (query.isError) {
+    return (
+      <View style={styles.centerContainer}>
+        <Text style={styles.errorText}>Failed to load feed</Text>
+        <Text style={styles.errorText}>{query.error.message}</Text>
+        <TouchableOpacity
+          style={styles.retryButton}
+          onPress={() => query.refetch()}
+        >
+          <Text style={styles.retryButtonText}>Retry</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  if (query.data.entries.length === 0) {
+    return (
+      <View style={styles.centerContainer}>
+        <Text style={{ fontSize: 16, color: AC.secondaryLabel }}>
+          No entries found
+        </Text>
+      </View>
+    );
+  }
+
+  return (
+    <FlatList
+      data={query.data.entries}
+      renderItem={({ item }) => <RssFeedItem entry={item} />}
+      keyExtractor={(item) => item.id}
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={styles.listContainer}
+      contentInsetAdjustmentBehavior="automatic"
+      refreshControl={
+        <RefreshControl
+          refreshing={query.isRefetching}
+          onRefresh={() => query.refetch()}
+          tintColor={tintColor}
+          colors={[tintColor]}
+        />
+      }
+    />
+  );
+}
+
 const styles = StyleSheet.create({
-  contentContainer: {
+  centerContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  listContainer: {
     padding: 16,
   },
   feedItem: {
@@ -98,16 +123,67 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
   },
+  feedHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
+  },
   feedItemTitle: {
     fontSize: 18,
     fontWeight: "600",
-    marginBottom: 8,
     color: "#1a1a1a",
+    flex: 1,
+  },
+  feedSource: {
+    fontSize: 14,
+    color: AC.secondaryLabel,
   },
   feedItemContent: {
     fontSize: 16,
     color: "#666",
     lineHeight: 24,
+    marginBottom: 8,
+  },
+  feedMeta: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  feedMetaText: {
+    fontSize: 14,
+    color: "#999",
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: "#666",
+  },
+  errorText: {
+    fontSize: 18,
+    color: "#FF3B30",
+    marginBottom: 16,
+  },
+  retryButton: {
+    backgroundColor: "#007AFF",
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  retryButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  emptyText: {
+    fontSize: 20,
+    fontWeight: "600",
+    color: "#1a1a1a",
+    marginBottom: 8,
+  },
+  emptySubtext: {
+    fontSize: 16,
+    color: "#666",
+    textAlign: "center",
   },
   // Search Results Styles
   searchResults: {
@@ -121,5 +197,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     opacity: 0.6,
     color: "#666",
+  },
+  feedFavicon: {
+    width: 24,
+    height: 24,
   },
 });

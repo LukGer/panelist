@@ -1,0 +1,1 @@
+ALTER TABLE "entries" ADD COLUMN "is_description_html" boolean DEFAULT false NOT NULL;

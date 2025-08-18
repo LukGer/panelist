@@ -5,19 +5,12 @@ import { useThemeColor } from "@/hooks/useThemeColor";
 import { Image } from "expo-image";
 import { Stack } from "expo-router";
 import { useState } from "react";
-import { Alert, Appearance } from "react-native";
+import { Appearance } from "react-native";
 
 export default function ProfileScreen() {
   const { session } = useAuth();
 
   const backgroundColor = useThemeColor({}, "background");
-
-  const handleFeaturePress = (featureName: string) => {
-    Alert.alert(
-      "Feature Coming Soon",
-      `${featureName} will be available in a future update.`
-    );
-  };
 
   return (
     <>
@@ -68,28 +61,7 @@ export default function ProfileScreen() {
           </Rounded>
         </Form.Section>
 
-        <Form.Section title="Reading Preferences">
-          <Form.FormItem
-            onPress={() => handleFeaturePress("Font Size Settings")}
-          >
-            <Form.Text systemImage="textformat.size">Font Size</Form.Text>
-            <Form.Text hint="Medium" />
-          </Form.FormItem>
-          <Form.FormItem
-            onPress={() => handleFeaturePress("Line Spacing Settings")}
-          >
-            <Form.Text systemImage="line.3.horizontal">Line Spacing</Form.Text>
-            <Form.Text hint="1.2" />
-          </Form.FormItem>
-          <Form.FormItem
-            onPress={() => handleFeaturePress("Reading Mode Settings")}
-          >
-            <Form.Text systemImage="text.alignleft">Reading Mode</Form.Text>
-            <Form.Text hint="Clean View" />
-          </Form.FormItem>
-        </Form.Section>
-
-        <DarkmodeSection />
+        <AppearanceSection />
       </Form.ScrollView>
     </>
   );
@@ -106,16 +78,15 @@ function useOptimisticDarkMode() {
       setDarkMode(value === "dark");
       setTimeout(() => {
         Appearance.setColorScheme(value);
-        // Add some time for the iOS switch animation to complete
       }, 100);
     },
   ] as const;
 }
 
-function DarkmodeSection() {
+function AppearanceSection() {
   const [darkMode, setDarkMode] = useOptimisticDarkMode();
   return (
-    <Form.Section title="Toggle">
+    <Form.Section title="Appearance">
       <Form.Toggle
         systemImage={{ name: darkMode ? "moon" : "sun.max" }}
         value={darkMode}

@@ -1,4 +1,9 @@
-import { SymbolView, SymbolViewProps, SymbolWeight } from "expo-symbols";
+import {
+  SFSymbol,
+  SymbolView,
+  SymbolViewProps,
+  SymbolWeight,
+} from "expo-symbols";
 import { ColorValue, StyleProp, ViewStyle } from "react-native";
 
 export function IconSymbol({
@@ -36,4 +41,4 @@ export function IconSymbol({
   );
 }
 
-export type IconSymbolName = SymbolViewProps["name"];
+export type IconSymbolName = SFSymbol;

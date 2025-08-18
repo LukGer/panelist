@@ -3,10 +3,9 @@
 import { IconSymbol, IconSymbolName } from "@/components/ui/icon-symbol";
 import { Image } from "@/components/ui/img";
 import { useScrollToTop } from "@/hooks/use-tab-to-top";
-import * as AC from "@bacons/apple-colors";
 import * as AppleColors from "@bacons/apple-colors";
 import { Href, LinkProps, Link as RouterLink, Stack } from "expo-router";
-import { SymbolWeight } from "expo-symbols";
+import { SFSymbol, SymbolWeight } from "expo-symbols";
 import * as WebBrowser from "expo-web-browser";
 import React, { use } from "react";
 import {
@@ -220,7 +219,10 @@ export function ScrollView(
         bottom: paddingBottom - (process.env.EXPO_OS === "ios" ? bottom : 0),
       }}
       {...props}
-      style={[{ backgroundColor: AC.systemGroupedBackground }, props.style]}
+      style={[
+        { backgroundColor: AppleColors.systemGroupedBackground },
+        props.style,
+      ]}
     />
   );
 }
@@ -483,7 +485,7 @@ export function Link({
                     WebBrowser.WebBrowserPresentationStyle.AUTOMATIC,
                 });
               } else if (
-                props.target === "share" &&
+                props.target === "_blank" &&
                 // Ensure the resolved href is an external URL.
                 /^([\w\d_+.-]+:)?\/\//.test(RouterLink.resolveHref(props.href))
               ) {
@@ -498,8 +500,9 @@ export function Link({
               }
             }
       }
-      children={resolvedChildren}
-    />
+    >
+      {resolvedChildren}
+    </RouterLink>
   );
 }
 
@@ -962,7 +965,7 @@ function SymbolView({
   const symbolProps: SystemImageCustomProps =
     typeof systemImage === "object" && "name" in systemImage
       ? systemImage
-      : { name: systemImage as unknown as string };
+      : { name: systemImage as SFSymbol };
 
   let color: string | OpaqueColorValue | undefined = symbolProps.color;
   if (color == null) {
@@ -998,13 +1001,16 @@ function LinkChevronIcon({
       if (React.isValidElement(systemImage)) {
         return systemImage;
       }
-      return (
-        <IconSymbol
-          name={systemImage.name}
-          size={systemImage.size ?? size}
-          color={systemImage.color ?? AppleColors.tertiaryLabel}
-        />
-      );
+
+      if (typeof systemImage === "object" && "name" in systemImage) {
+        return (
+          <IconSymbol
+            name={systemImage.name}
+            size={systemImage.size ?? size}
+            color={systemImage.color ?? AppleColors.tertiaryLabel}
+          />
+        );
+      }
     }
   }
 

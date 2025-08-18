@@ -8,29 +8,12 @@ import {
   timestamp,
   uuid,
 } from "drizzle-orm/pg-core";
-
-export const users = pgTable(
-  "users",
-  {
-    id: uuid("id").primaryKey().defaultRandom(),
-    email: text("email").notNull().unique(),
-    name: text("name"),
-    avatarUrl: text("avatar_url"),
-    createdAt: timestamp("created_at").notNull().defaultNow(),
-    updatedAt: timestamp("updated_at").notNull().defaultNow(),
-  },
-  (table) => ({
-    emailIdx: index("email_idx").on(table.email),
-  })
-);
+import { user } from "./auth-schema";
 
 export const feeds = pgTable(
   "feeds",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    userId: uuid("user_id")
-      .notNull()
-      .references(() => users.id, { onDelete: "cascade" }),
     title: text("title").notNull(),
     url: text("url").notNull(),
     description: text("description"),
@@ -41,10 +24,25 @@ export const feeds = pgTable(
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
   },
-  (table) => ({
-    userIdIdx: index("feeds_user_id_idx").on(table.userId),
-    urlIdx: index("feeds_url_idx").on(table.url),
-  })
+  (table) => [index("feeds_url_idx").on(table.url)]
+);
+
+export const userFeeds = pgTable(
+  "user_feeds",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    feedId: uuid("feed_id")
+      .notNull()
+      .references(() => feeds.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (table) => [
+    index("user_feeds_user_id_idx").on(table.userId),
+    index("user_feeds_feed_id_idx").on(table.feedId),
+  ]
 );
 
 export const entries = pgTable(
@@ -57,6 +55,7 @@ export const entries = pgTable(
     title: text("title").notNull(),
     link: text("link").notNull(),
     description: text("description"),
+    isDescriptionHtml: boolean("is_description_html").notNull().default(false),
     content: text("content"),
     author: text("author"),
     guid: text("guid").notNull(),
@@ -68,24 +67,28 @@ export const entries = pgTable(
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
   },
-  (table) => ({
-    feedIdIdx: index("entries_feed_id_idx").on(table.feedId),
-    guidIdx: index("entries_guid_idx").on(table.guid),
-    pubDateIdx: index("entries_pub_date_idx").on(table.pubDate),
-    isReadIdx: index("entries_is_read_idx").on(table.isRead),
-  })
+  (table) => [
+    index("entries_feed_id_idx").on(table.feedId),
+    index("entries_guid_idx").on(table.guid),
+    index("entries_pub_date_idx").on(table.pubDate),
+    index("entries_is_read_idx").on(table.isRead),
+  ]
 );
 
-export const usersRelations = relations(users, ({ many }) => ({
-  feeds: many(feeds),
+export const feedsRelations = relations(feeds, ({ many }) => ({
+  userFeeds: many(userFeeds),
+  entries: many(entries),
 }));
 
-export const feedsRelations = relations(feeds, ({ one, many }) => ({
-  user: one(users, {
-    fields: [feeds.userId],
-    references: [users.id],
+export const userFeedsRelations = relations(userFeeds, ({ one }) => ({
+  user: one(user, {
+    fields: [userFeeds.userId],
+    references: [user.id],
   }),
-  entries: many(entries),
+  feed: one(feeds, {
+    fields: [userFeeds.feedId],
+    references: [feeds.id],
+  }),
 }));
 
 export const entriesRelations = relations(entries, ({ one }) => ({
@@ -95,9 +98,11 @@ export const entriesRelations = relations(entries, ({ one }) => ({
   }),
 }));
 
-export type User = typeof users.$inferSelect;
-export type NewUser = typeof users.$inferInsert;
 export type Feed = typeof feeds.$inferSelect;
 export type NewFeed = typeof feeds.$inferInsert;
+export type UserFeed = typeof userFeeds.$inferSelect;
+export type NewUserFeed = typeof userFeeds.$inferInsert;
 export type Entry = typeof entries.$inferSelect;
 export type NewEntry = typeof entries.$inferInsert;
+
+export type EntryWithFeed = Entry & { feed: Feed };
