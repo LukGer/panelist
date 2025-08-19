@@ -24,17 +24,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
     error: error || null,
   };
 
-  // Show loading state
   if (isPending) {
     return <LoadingScreen message="Loading authentication..." />;
   }
 
-  // Show error state
   if (error) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <Text style={{ color: "red", textAlign: "center" }}>
-          Authentication Error: {error.message}
+          Authentication Error: {JSON.stringify(error)}
         </Text>
       </View>
     );
