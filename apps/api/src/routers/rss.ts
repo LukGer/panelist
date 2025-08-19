@@ -118,6 +118,18 @@ const subscribedRoute = createRoute({
               thumbnailUrl: z.string().nullable(),
               createdAt: z.date(),
               updatedAt: z.date(),
+              feed: z.object({
+                id: z.uuid(),
+                title: z.string(),
+                url: z.string(),
+                description: z.string().nullable(),
+                siteUrl: z.string().nullable(),
+                faviconUrl: z.string().nullable(),
+                lastFetched: z.date().nullable(),
+                isActive: z.boolean(),
+                createdAt: z.date(),
+                updatedAt: z.date(),
+              }),
             })
           ),
         },
@@ -173,6 +185,18 @@ rssRouter.openapi(subscribedRoute, async (c) => {
       thumbnailUrl: entries.thumbnailUrl,
       createdAt: entries.createdAt,
       updatedAt: entries.updatedAt,
+      feed: {
+        id: feeds.id,
+        title: feeds.title,
+        url: feeds.url,
+        description: feeds.description,
+        siteUrl: feeds.siteUrl,
+        faviconUrl: feeds.faviconUrl,
+        lastFetched: feeds.lastFetched,
+        isActive: feeds.isActive,
+        createdAt: feeds.createdAt,
+        updatedAt: feeds.updatedAt,
+      },
     })
     .from(entries)
     .innerJoin(feeds, eq(entries.feedId, feeds.id))

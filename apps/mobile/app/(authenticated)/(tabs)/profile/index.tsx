@@ -1,12 +1,14 @@
 import { authClient } from "@/auth/client";
+import Button from "@/components/button";
 import * as Form from "@/components/ui/form";
 import { Rounded } from "@/components/ui/rounded";
 import { useAuth } from "@/contexts/auth-context";
 import { useThemeColor } from "@/hooks/useThemeColor";
+import * as AC from "@bacons/apple-colors";
 import { Image } from "expo-image";
 import { Stack } from "expo-router";
 import { useState } from "react";
-import { Appearance } from "react-native";
+import { Appearance, Text } from "react-native";
 
 export default function ProfileScreen() {
   const { session } = useAuth();
@@ -62,11 +64,15 @@ export default function ProfileScreen() {
           </Rounded>
         </Form.Section>
 
-        <Form.Section title="Cookie">
-          <Form.Text selectable>{authClient.getCookie()}</Form.Text>
+        <Form.Section title="Admin">
+          <Form.Link href="/admin">Open Admin Panel</Form.Link>
         </Form.Section>
 
         <AppearanceSection />
+
+        <Button style={{ marginTop: 16 }} onPress={() => authClient.signOut()}>
+          <Text style={{ color: AC.systemRed }}>Sign Out</Text>
+        </Button>
       </Form.ScrollView>
     </>
   );
