@@ -15,6 +15,7 @@ import {
 
 export default function FeedScreen() {
   const backgroundColor = useThemeColor({}, "background");
+  const query = useSubscribedEntries();
 
   return (
     <>
@@ -36,15 +37,13 @@ export default function FeedScreen() {
           },
         }}
       />
-      <FeedList />
+      <FeedList query={query} />
     </>
   );
 }
 
-function FeedList() {
+function FeedList({ query }: { query: any }) {
   const tintColor = useThemeColor({}, "primary");
-
-  const query = useSubscribedEntries();
 
   if (query.isLoading && !query.data) {
     return (
@@ -70,7 +69,7 @@ function FeedList() {
     );
   }
 
-  if (!query.isSuccess || query.data.length === 0) {
+  if (query.data.entries.length === 0) {
     return (
       <View style={styles.centerContainer}>
         <Text style={{ fontSize: 16, color: AC.secondaryLabel }}>
@@ -82,7 +81,7 @@ function FeedList() {
 
   return (
     <FlatList
-      data={query.data}
+      data={query.data.entries}
       renderItem={({ item }) => <RssFeedItem entry={item} />}
       keyExtractor={(item) => item.id}
       showsVerticalScrollIndicator={false}

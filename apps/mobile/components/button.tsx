@@ -1,15 +1,12 @@
 import { useThemeColor } from "@/hooks/useThemeColor";
 import {
   GestureResponderEvent,
-  StyleProp,
   StyleSheet,
   Text,
   TouchableOpacity,
-  ViewStyle,
 } from "react-native";
 
 export type ButtonProps = Readonly<{
-  style?: StyleProp<ViewStyle>;
   children: React.ReactNode;
   onPress?: ((event: GestureResponderEvent) => void) | undefined;
 }>;
@@ -19,7 +16,7 @@ const Button = (props: ButtonProps) => {
 
   return (
     <TouchableOpacity
-      style={[styles.wrapper, props.style]}
+      style={styles.wrapper}
       onPress={props.onPress}
       activeOpacity={0.8}
       accessibilityRole="button"

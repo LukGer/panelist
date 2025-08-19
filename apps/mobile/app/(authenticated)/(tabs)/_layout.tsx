@@ -29,7 +29,6 @@ export default function TabLayout() {
         options={{
           title: "Discover",
           tabBarIcon: () => ({ sfSymbol: "magnifyingglass" }),
-          role: "search",
         }}
       />
       <Tabs.Screen
