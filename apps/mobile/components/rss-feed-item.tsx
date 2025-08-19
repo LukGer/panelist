@@ -1,23 +1,18 @@
+import { SubscribedEntry } from "@/hooks/use-subscribed-entries";
 import * as AC from "@bacons/apple-colors";
 import type { EntryWithFeed } from "api/database";
 import { Image } from "expo-image";
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  useWindowDimensions,
-} from "react-native";
+import { StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import RenderHtml from "react-native-render-html";
 
 const PARENT_PADDING = 16;
 const CONTENT_PADDING = 16;
 
-export default function RssFeedItem(props: { entry: EntryWithFeed }) {
+export default function RssFeedItem(props: { entry: SubscribedEntry }) {
   const entry = props.entry;
 
   return (
-    <TouchableOpacity style={styles.feedItem}>
+    <View style={styles.feedItem}>
       <View style={styles.feedHeader}>
         <Text style={styles.feedItemTitle}>{entry.title}</Text>
 
@@ -37,7 +32,7 @@ export default function RssFeedItem(props: { entry: EntryWithFeed }) {
           </Text>
         )}
       </View>
-    </TouchableOpacity>
+    </View>
   );
 }
 
@@ -60,7 +55,7 @@ function FeedItemContent({ entry }: { entry: EntryWithFeed }) {
 
 const styles = StyleSheet.create({
   feedItem: {
-    backgroundColor: "white",
+    backgroundColor: AC.secondarySystemBackground,
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
@@ -72,7 +67,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 3.84,
     elevation: 5,
-    gap: 8,
+    gap: 12,
   },
   feedHeader: {
     flexDirection: "row",

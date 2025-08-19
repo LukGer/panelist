@@ -58,6 +58,10 @@ function RootLayoutContent() {
               options={{ headerShown: false }}
             />
             <Stack.Screen name="+not-found" />
+            <Stack.Screen
+              name="admin"
+              options={{ headerShown: false, presentation: "formSheet" }}
+            />
           </Stack>
         </AuthProvider>
       </DatabaseProvider>
