@@ -2,7 +2,14 @@ import { SubscribedEntry } from "@/hooks/use-subscribed-entries";
 import * as AC from "@bacons/apple-colors";
 import type { EntryWithFeed } from "api/database";
 import { Image } from "expo-image";
-import { StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { Link } from "expo-router";
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  useWindowDimensions,
+} from "react-native";
 import RenderHtml from "react-native-render-html";
 
 const PARENT_PADDING = 16;
@@ -12,27 +19,52 @@ export default function RssFeedItem(props: { entry: SubscribedEntry }) {
   const entry = props.entry;
 
   return (
-    <View style={styles.feedItem}>
-      <View style={styles.feedHeader}>
-        <Text style={styles.feedItemTitle}>{entry.title}</Text>
-
-        {entry.feed.faviconUrl && (
-          <Image source={entry.feed.faviconUrl} style={styles.feedFavicon} />
-        )}
-        <Text style={styles.feedSource}>{entry.feed.title}</Text>
-      </View>
-      <FeedItemContent entry={entry} />
-      <View style={styles.feedMeta}>
-        {entry.author && (
-          <Text style={styles.feedMetaText}>By {entry.author}</Text>
-        )}
-        {entry.pubDate && (
-          <Text style={styles.feedMetaText}>
-            {new Date(entry.pubDate).toLocaleDateString()}
-          </Text>
-        )}
-      </View>
-    </View>
+    <Link
+      href={{
+        pathname: "/feed/entry/[entryId]",
+        params: { entryId: entry.id },
+      }}
+      asChild
+    >
+      <TouchableOpacity activeOpacity={0.7}>
+        <View style={styles.feedItem}>
+          <View style={styles.feedHeader}>
+            <Text style={styles.feedItemTitle}>{entry.title}</Text>
+            <Link
+              href={{
+                pathname: "/feed/[feedId]",
+                params: { feedId: entry.feedId },
+              }}
+              asChild
+            >
+              <TouchableOpacity
+                activeOpacity={0.7}
+                style={{ flexDirection: "row", alignItems: "center", gap: 4 }}
+              >
+                {entry.feed.faviconUrl && (
+                  <Image
+                    source={entry.feed.faviconUrl}
+                    style={styles.feedFavicon}
+                  />
+                )}
+                <Text style={styles.feedSource}>{entry.feed.title}</Text>
+              </TouchableOpacity>
+            </Link>
+          </View>
+          <FeedItemContent entry={entry} />
+          <View style={styles.feedMeta}>
+            {entry.author && (
+              <Text style={styles.feedMetaText}>By {entry.author}</Text>
+            )}
+            {entry.pubDate && (
+              <Text style={styles.feedMetaText}>
+                {new Date(entry.pubDate).toLocaleDateString()}
+              </Text>
+            )}
+          </View>
+        </View>
+      </TouchableOpacity>
+    </Link>
   );
 }
 
