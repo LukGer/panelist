@@ -6,19 +6,25 @@
     "development": {
       "developmentClient": true,
       "distribution": "internal",
+      "ios": {
+        "simulator": true
+      },
       "env": {
+        "APP_VARIANT": "dev",
         "EXPO_PUBLIC_API_BASE_URL": "http://localhost:3000"
       }
     },
     "preview": {
       "distribution": "internal",
       "env": {
+        "APP_VARIANT": "pre",
         "EXPO_PUBLIC_API_BASE_URL": "https://dev.panelist.lukger.dev.com"
       }
     },
     "production": {
       "env": {
-        "EXPO_PUBLIC_API_BASE_URL": "https://your-production-api.com"
+        "APP_VARIANT": "prd",
+        "EXPO_PUBLIC_API_BASE_URL": "https://panelist.lukger.dev"
       }
     }
   },

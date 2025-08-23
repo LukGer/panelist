@@ -32,7 +32,6 @@ import {
 import Animated from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { HeaderButton } from "./header";
-import { useBottomTabOverflow } from "./tab-bar-background";
 
 type ListStyle = "grouped" | "auto";
 
