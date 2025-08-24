@@ -12,7 +12,7 @@ import { RssService } from "@/services/rss-service";
 import { createApp } from "@/utils/createApp";
 import { createRoute } from "@hono/zod-openapi";
 import { env } from "cloudflare:workers";
-import { count, desc, eq } from "drizzle-orm";
+import { and, count, desc, eq } from "drizzle-orm";
 import { z } from "zod";
 
 const rssRouter = createApp();
@@ -88,10 +88,14 @@ rssRouter.openapi(fetchAllRoute, async (c) => {
     return c.json({ error: "No active feeds found" }, 404);
   }
 
-  const rssService = new RssService();
-  const newEntries = await rssService.fetchFeeds(activeFeeds);
-
-  await db.insert(entries).values(newEntries);
+  try {
+    const rssService = new RssService();
+    const newEntries = await rssService.fetchFeeds(activeFeeds);
+    await db.insert(entries).values(newEntries);
+  } catch (err) {
+    console.error(err);
+    return c.json({ error: "Failed to fetch feeds" }, 500);
+  }
 
   return c.json(
     { message: `Successfully processed ${activeFeeds.length} feeds.` },
@@ -176,6 +180,8 @@ rssRouter.openapi(subscribedRoute, async (c) => {
   const userId = user.id;
   const db = getDb(env);
 
+  console.log("API: Fetching subscribed entries for user:", userId);
+
   const subscribedEntries = await db
     .select({
       id: entries.id,
@@ -212,6 +218,16 @@ rssRouter.openapi(subscribedRoute, async (c) => {
     .innerJoin(userFeeds, eq(feeds.id, userFeeds.feedId))
     .where(eq(userFeeds.userId, userId))
     .orderBy(desc(entries.pubDate), desc(entries.createdAt));
+
+  console.log("API: Found", subscribedEntries.length, "subscribed entries");
+  if (subscribedEntries.length > 0 && subscribedEntries[0]) {
+    console.log(
+      "API: First entry ID:",
+      subscribedEntries[0].id,
+      "Title:",
+      subscribedEntries[0].title
+    );
+  }
 
   return c.json(subscribedEntries, 200);
 });
@@ -385,6 +401,148 @@ rssRouter.openapi(feedDetailsRoute, async (c) => {
     },
     200
   );
+});
+
+const entryDetailsRoute = createRoute({
+  method: "get",
+  path: "/entries/{entryId}",
+  security: [{ BearerAuth: [] }],
+  middleware: [authenticate],
+  request: {
+    params: z.object({
+      entryId: z.string().uuid(),
+    }),
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: z.object({
+            id: z.uuid(),
+            feedId: z.uuid(),
+            title: z.string(),
+            link: z.string(),
+            description: z.string().nullable(),
+            isDescriptionHtml: z.boolean(),
+            summary: z.string().nullable(),
+            content: z.string().nullable(),
+            author: z.string().nullable(),
+            guid: z.string(),
+            pubDate: z.date().nullable(),
+            isRead: z.boolean(),
+            isBookmarked: z.boolean(),
+            thumbnailUrl: z.string().nullable(),
+            createdAt: z.date(),
+            updatedAt: z.date(),
+            feed: z.object({
+              id: z.uuid(),
+              title: z.string(),
+              url: z.string(),
+              description: z.string().nullable(),
+              siteUrl: z.string().nullable(),
+              faviconUrl: z.string().nullable(),
+              lastFetched: z.date().nullable(),
+              isActive: z.boolean(),
+              createdAt: z.date(),
+              updatedAt: z.date(),
+            }),
+          }),
+        },
+      },
+      description: "Successfully fetched entry details",
+    },
+    401: {
+      content: {
+        "application/json": {
+          schema: ErrorResponseSchema,
+        },
+      },
+      description: "Unauthorized - Invalid session",
+    },
+    404: {
+      content: {
+        "application/json": {
+          schema: ErrorResponseSchema,
+        },
+      },
+      description: "Entry not found",
+    },
+    500: {
+      content: {
+        "application/json": {
+          schema: ErrorResponseSchema,
+        },
+      },
+      description: "Internal server error",
+    },
+  },
+  tags: ["RSS"],
+  summary: "Get detailed information about a specific entry",
+  description:
+    "Retrieves detailed information about a specific RSS entry including feed information.",
+});
+
+rssRouter.openapi(entryDetailsRoute, async (c) => {
+  const user = c.get("user");
+  if (!user) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
+
+  const { entryId } = c.req.valid("param");
+  console.log("API: Fetching entry details for entryId:", entryId);
+
+  const db = getDb(env);
+
+  // Get entry with feed information
+  const entryData = await db
+    .select({
+      id: entries.id,
+      feedId: entries.feedId,
+      title: entries.title,
+      link: entries.link,
+      description: entries.description,
+      isDescriptionHtml: entries.isDescriptionHtml,
+      summary: entries.summary,
+      content: entries.content,
+      author: entries.author,
+      guid: entries.guid,
+      pubDate: entries.pubDate,
+      isRead: entries.isRead,
+      isBookmarked: entries.isBookmarked,
+      thumbnailUrl: entries.thumbnailUrl,
+      createdAt: entries.createdAt,
+      updatedAt: entries.updatedAt,
+      feed: {
+        id: feeds.id,
+        title: feeds.title,
+        url: feeds.url,
+        description: feeds.description,
+        siteUrl: feeds.siteUrl,
+        faviconUrl: feeds.faviconUrl,
+        lastFetched: feeds.lastFetched,
+        isActive: feeds.isActive,
+        createdAt: feeds.createdAt,
+        updatedAt: feeds.updatedAt,
+      },
+    })
+    .from(entries)
+    .innerJoin(feeds, eq(entries.feedId, feeds.id))
+    .innerJoin(userFeeds, eq(feeds.id, userFeeds.feedId))
+    .where(and(eq(entries.id, entryId), eq(userFeeds.userId, user.id)))
+    .limit(1);
+
+  console.log("API: Database query result length:", entryData.length);
+  if (entryData.length > 0 && entryData[0]) {
+    console.log("API: Found entry with title:", entryData[0].title);
+  }
+
+  if (entryData.length === 0) {
+    console.log("API: No entry found for entryId:", entryId);
+    return c.json({ error: "Entry not found" }, 404);
+  }
+
+  console.log("API: Returning entry data");
+  return c.json(entryData[0], 200);
 });
 
 export default rssRouter;

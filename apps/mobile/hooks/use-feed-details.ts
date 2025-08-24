@@ -1,6 +1,6 @@
 import { makeAuthenticatedRequest } from "@/auth/request";
+import type { Feed } from "@panelist/api/database";
 import { useQuery } from "@tanstack/react-query";
-import type { Feed } from "api/database";
 
 export interface FeedDetails extends Feed {
   _count: {

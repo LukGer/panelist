@@ -2,19 +2,28 @@ import { NewEntry } from "@/db/schema";
 import RssParser from "rss-parser";
 
 export class RssService {
-  private readonly _parser: RssParser;
-
-  public constructor() {
-    this._parser = new RssParser();
-  }
-
   public async fetchFeeds(
     feeds: { id: string; url: string }[]
   ): Promise<NewEntry[]> {
     const newEntries: NewEntry[] = [];
 
     for (const feed of feeds) {
-      const result = await this._parser.parseURL(feed.url);
+      const response = await fetch(feed.url, {
+        headers: {
+          "User-Agent": "panelist-rss-fetcher/1.0",
+          Accept: "application/rss+xml, application/atom+xml, text/xml",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch RSS feed: ${response.status} ${response.statusText}`
+        );
+      }
+
+      const xmlText = await response.text();
+      const parser = new RssParser();
+      const result = await parser.parseString(xmlText);
 
       for (const item of result.items) {
         const isDescriptionHtml = item.content?.includes("<");

@@ -1,6 +1,6 @@
 import { SubscribedEntry } from "@/hooks/use-subscribed-entries";
 import * as AC from "@bacons/apple-colors";
-import type { EntryWithFeed } from "api/database";
+import type { EntryWithFeed } from "@panelist/api/database";
 import { Image } from "expo-image";
 import { Link } from "expo-router";
 import {
@@ -87,7 +87,7 @@ function FeedItemContent({ entry }: { entry: EntryWithFeed }) {
 
 const styles = StyleSheet.create({
   feedItem: {
-    backgroundColor: AC.secondarySystemBackground,
+    backgroundColor: AC.tertiarySystemBackground,
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
@@ -115,11 +115,11 @@ const styles = StyleSheet.create({
   },
   feedSource: {
     fontSize: 14,
-    color: AC.secondaryLabel,
+    color: AC.label,
   },
   feedItemContent: {
     fontSize: 16,
-    color: "#666",
+    color: AC.label,
     lineHeight: 24,
     marginBottom: 8,
   },
@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
   },
   feedMetaText: {
     fontSize: 14,
-    color: "#999",
+    color: AC.secondaryLabel,
   },
   feedFavicon: {
     width: 24,

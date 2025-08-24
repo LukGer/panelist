@@ -41,17 +41,21 @@ export const withJob = (options: JobMiddlewareOptions) => {
       const response = c.res;
       const status = response.status;
 
+      // Read the response body once to avoid "Body has already been used" error
+      const responseBody = await response
+        .json()
+        .catch(() => ({}) as Record<string, unknown>);
+
       if (response.ok) {
-        const responseBody = await response.json().catch(() => null);
         const message =
-          responseBody?.message ?? `${jobName} completed successfully`;
+          (responseBody as { message?: string })?.message ??
+          `${jobName} completed successfully`;
 
         await JobService.completeJob(jobId, message);
       } else {
-        const responseBody = await response.json().catch(() => null);
         const errorMessage =
-          responseBody?.error ??
-          responseBody?.message ??
+          (responseBody as { error?: string; message?: string })?.error ??
+          (responseBody as { error?: string; message?: string })?.message ??
           `${jobName} failed with status ${status}`;
 
         await JobService.failJob(jobId, errorMessage);
