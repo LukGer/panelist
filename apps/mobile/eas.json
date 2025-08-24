@@ -1,6 +1,6 @@
 {
   "cli": {
-    "version": ">= 5.9.1"
+    "appVersionSource": "remote"
   },
   "build": {
     "development": {
@@ -18,7 +18,7 @@
       "distribution": "internal",
       "env": {
         "APP_VARIANT": "pre",
-        "EXPO_PUBLIC_API_BASE_URL": "https://dev.panelist.lukger.dev.com"
+        "EXPO_PUBLIC_API_BASE_URL": "https://dev.panelist.lukger.dev"
       }
     },
     "production": {

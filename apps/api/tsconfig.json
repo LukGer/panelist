@@ -1,6 +1,7 @@
 {
   "extends": "@panelist/typescript-config/base.json",
   "compilerOptions": {
+    "types": ["./worker-configuration.d.ts"],
     "strict": true,
     "jsx": "react-jsx",
     "jsxImportSource": "hono/jsx",

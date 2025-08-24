@@ -23,9 +23,11 @@
     "packages/*"
   ],
   "trustedDependencies": [
+    "aws-sdk",
     "es5-ext",
     "esbuild",
-    "sharp"
+    "sharp",
+    "workerd"
   ],
   "dependencies": {
     "sst": "3.17.10"

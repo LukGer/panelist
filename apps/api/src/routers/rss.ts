@@ -1,4 +1,4 @@
-import { db } from "@/db/config";
+import { getDb } from "@/db/config";
 import {
   categories,
   entries,
@@ -11,6 +11,7 @@ import { withJob } from "@/middleware/job-middleware";
 import { RssService } from "@/services/rss-service";
 import { createApp } from "@/utils/createApp";
 import { createRoute } from "@hono/zod-openapi";
+import { env } from "cloudflare:workers";
 import { count, desc, eq } from "drizzle-orm";
 import { z } from "zod";
 
@@ -21,7 +22,7 @@ const ErrorResponseSchema = z.object({
 });
 
 const fetchAllRoute = createRoute({
-  method: "get",
+  method: "post",
   path: "/fetch-all",
   security: [{ ApiKeyAuth: [] }],
   middleware: [authenticateApiKey, withJob({ jobName: "rss-fetch-all" })],
@@ -74,6 +75,7 @@ rssRouter.openapi(fetchAllRoute, async (c) => {
     return c.json({ error: "Unauthorized" }, 401);
   }
 
+  const db = getDb(env);
   const activeFeeds = await db
     .select({
       id: feeds.id,
@@ -172,6 +174,7 @@ rssRouter.openapi(subscribedRoute, async (c) => {
   }
 
   const userId = user.id;
+  const db = getDb(env);
 
   const subscribedEntries = await db
     .select({
@@ -299,6 +302,7 @@ rssRouter.openapi(feedDetailsRoute, async (c) => {
   }
 
   const { feedId } = c.req.valid("param");
+  const db = getDb(env);
 
   // Get basic feed info
   const feed = await db

@@ -1,13 +1,18 @@
 import { Scalar } from "@scalar/hono-api-reference";
-import { auth } from "./auth";
+import { secureHeaders } from "hono/secure-headers";
+import { getAuth } from "./auth";
 import rssRouter from "./routers/rss";
 import { createApp } from "./utils/createApp";
 
 const app = createApp();
 
+app.use(secureHeaders());
+
 app.get("/scalar", Scalar({ url: "/doc" }));
 
-app.on(["POST", "GET"], "/api/auth/**", (c) => auth.handler(c.req.raw));
+app.on(["POST", "GET"], "/api/auth/**", (c) =>
+  getAuth(c.env).handler(c.req.raw)
+);
 
 app.route("/api/rss", rssRouter);
 

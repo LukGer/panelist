@@ -1,7 +1,7 @@
 {
   "name": "@panelist/api",
   "scripts": {
-    "dev": "bun run --hot src/index.ts",
+    "dev": "wrangler dev",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
@@ -18,6 +18,6 @@
     "rss-parser": "^3.13.0"
   },
   "devDependencies": {
-    "@types/bun": "latest"
+    "wrangler": "^4.32.0"
   }
 }

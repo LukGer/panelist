@@ -10,8 +10,6 @@ export const authClient = createAuthClient({
   baseURL: authURL,
   plugins: [
     expoClient({
-      scheme: "panelist",
-      storagePrefix: "panelist",
       storage: SecureStore,
     }),
     adminClient(),

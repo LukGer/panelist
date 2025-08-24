@@ -200,8 +200,6 @@ if (__DEV__) List.displayName = "FormList";
 export function ScrollView(
   props: ScrollViewProps & { ref?: React.Ref<Animated.ScrollView> }
 ) {
-  const paddingBottom = useBottomTabOverflow();
-
   const { top: statusBarInset, bottom } = useSafeAreaInsets(); // inset of the status bar
 
   const largeHeaderInset = statusBarInset + 92; // inset to use for a large header since it's frame is equal to 96 + the frame of status bar
@@ -213,9 +211,9 @@ export function ScrollView(
       scrollToOverflowEnabled
       automaticallyAdjustsScrollIndicatorInsets
       contentInsetAdjustmentBehavior="automatic"
-      contentInset={{ bottom: paddingBottom }}
+      contentInset={{ bottom }}
       scrollIndicatorInsets={{
-        bottom: paddingBottom - (process.env.EXPO_OS === "ios" ? bottom : 0),
+        bottom: bottom,
       }}
       {...props}
       style={[

@@ -3,9 +3,11 @@ import postgres from "postgres";
 import * as authSchema from "./auth-schema";
 import * as appSchema from "./schema";
 
-export const db = drizzle(postgres(process.env.DATABASE_URL as string), {
-  schema: {
-    ...authSchema,
-    ...appSchema,
-  },
-});
+export const getDb = (env: Env) => {
+  return drizzle(postgres(env.DATABASE_URL), {
+    schema: {
+      ...authSchema,
+      ...appSchema,
+    },
+  });
+};

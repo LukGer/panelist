@@ -2,7 +2,7 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 import { AuthContext } from "../middleware/auth-middleware";
 import { JobContext } from "../middleware/job-middleware";
 
-type AppContext = AuthContext & JobContext;
+type AppContext = AuthContext & JobContext & Env;
 
 export const createApp = () => {
   const app = new OpenAPIHono<{
