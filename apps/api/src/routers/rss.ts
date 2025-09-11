@@ -94,7 +94,13 @@ rssRouter.openapi(fetchAllRoute, async (c) => {
     await db.insert(entries).values(newEntries);
   } catch (err) {
     console.error(err);
-    return c.json({ error: "Failed to fetch feeds" }, 500);
+    return c.json(
+      {
+        error: "Failed to fetch feeds",
+        message: (err as unknown as Error).message,
+      },
+      500
+    );
   }
 
   return c.json(

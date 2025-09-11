@@ -1,7 +1,7 @@
 import { authClient } from "@/auth/client";
 import { LoadingScreen } from "@/components/loading-screen";
-import { Tabs } from "@/components/tabs";
 import { Redirect } from "expo-router";
+import { Icon, Label, NativeTabs } from "expo-router/unstable-native-tabs";
 import React from "react";
 
 export default function TabLayout() {
@@ -16,36 +16,23 @@ export default function TabLayout() {
   }
 
   return (
-    <Tabs>
-      <Tabs.Screen
-        name="feed"
-        options={{
-          title: "Home",
-          tabBarIcon: () => ({ sfSymbol: "house" }),
-        }}
-      />
-      <Tabs.Screen
-        name="discover"
-        options={{
-          title: "Discover",
-          tabBarIcon: () => ({ sfSymbol: "magnifyingglass" }),
-          role: "search",
-        }}
-      />
-      <Tabs.Screen
-        name="saved"
-        options={{
-          title: "Saved",
-          tabBarIcon: () => ({ sfSymbol: "bookmark.fill" }),
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: "Profile",
-          tabBarIcon: () => ({ sfSymbol: "person.fill" }),
-        }}
-      />
-    </Tabs>
+    <NativeTabs>
+      <NativeTabs.Trigger>
+        <Label>Home</Label>
+        <Icon sf="house" />
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger>
+        <Label>Discover</Label>
+        <Icon sf="magnifyingglass" />
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger>
+        <Label>Saved</Label>
+        <Icon sf="bookmark.fill" />
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger>
+        <Label>Profile</Label>
+        <Icon sf="person.fill" />
+      </NativeTabs.Trigger>
+    </NativeTabs>
   );
 }

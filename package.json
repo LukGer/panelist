@@ -9,7 +9,7 @@
     "lint": "turbo run lint"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "4.20250813.0",
+    "@cloudflare/workers-types": "4.20250911.0",
     "prettier": "^3.6.2",
     "turbo": "^2.5.6",
     "typescript": "5.9.2"
@@ -30,6 +30,6 @@
     "workerd"
   ],
   "dependencies": {
-    "sst": "3.17.10"
+    "sst": "3.17.13"
   }
 }

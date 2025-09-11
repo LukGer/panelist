@@ -2,7 +2,7 @@
   "name": "panelist-api",
   "main": "src/index.ts",
   "compatibility_date": "2025-08-16",
-  "compatibility_flags": ["nodejs_compat"],
+  "compatibility_flags": ["nodejs_compat_v2"],
 
   "dev": {
     "port": 3000,

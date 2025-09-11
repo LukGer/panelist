@@ -1,14 +1,24 @@
 import { authClient } from "@/auth/client";
-import Button from "@/components/button";
-import * as Form from "@/components/ui/form";
-import { Rounded } from "@/components/ui/rounded";
 import { useAuth } from "@/contexts/auth-context";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import * as AC from "@bacons/apple-colors";
+import {
+  Button,
+  Form,
+  Host,
+  HStack,
+  Section,
+  Spacer,
+  Switch,
+  Text,
+  VStack,
+} from "@expo/ui/swift-ui";
+import { glassEffect, padding } from "@expo/ui/swift-ui/modifiers";
 import { Image } from "expo-image";
-import { Stack } from "expo-router";
+import { Link, Stack } from "expo-router";
+import { SymbolView } from "expo-symbols";
 import { useState } from "react";
-import { Appearance, Text } from "react-native";
+import { Appearance, ScrollView } from "react-native";
 
 export default function ProfileScreen() {
   const { session } = useAuth();
@@ -21,59 +31,61 @@ export default function ProfileScreen() {
         options={{
           headerTitle: "Profile",
           headerLargeTitle: true,
-          headerTransparent: true,
-          headerLargeTitleShadowVisible: false,
-          headerShadowVisible: false,
-          headerLargeStyle: {
-            backgroundColor: "transparent",
-          },
-          headerStyle: {
-            backgroundColor: "transparent",
-          },
           contentStyle: {
             backgroundColor: backgroundColor,
           },
         }}
       />
-      <Form.ScrollView
+      <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         contentContainerStyle={{ gap: 16 }}
       >
-        <Form.Section>
-          <Rounded padding style={{ alignItems: "center", gap: 8, flex: 1 }}>
-            <Image
-              source={{ uri: session?.user.image! }}
-              style={{
-                aspectRatio: 1,
-                height: 64,
-                borderRadius: 8,
-              }}
-            />
-            <Form.Text
-              style={{
-                fontSize: 20,
-                fontFamily: "ui-rounded",
-                fontWeight: "600",
-              }}
-            >
-              {session?.user.name}
-            </Form.Text>
-            <Form.Text style={{ textAlign: "center", fontSize: 14 }}>
-              {session?.user.email}
-            </Form.Text>
-          </Rounded>
-        </Form.Section>
-
-        <Form.Section title="Admin">
-          <Form.Link href="/admin">Open Admin Panel</Form.Link>
-        </Form.Section>
-
-        <AppearanceSection />
-
-        <Button style={{ marginTop: 16 }} onPress={() => authClient.signOut()}>
-          <Text style={{ color: AC.systemRed }}>Sign Out</Text>
-        </Button>
-      </Form.ScrollView>
+        <Host style={{ flex: 1 }}>
+          <Form>
+            <Section>
+              <VStack alignment="center">
+                {session?.user.image && (
+                  <Image source={{ uri: session?.user.image! }} />
+                )}
+                <Text
+                  size={24}
+                  modifiers={[
+                    padding({
+                      all: 16,
+                    }),
+                    glassEffect({
+                      glass: {
+                        variant: "clear",
+                      },
+                    }),
+                  ]}
+                >
+                  {session?.user.name ?? ""}
+                </Text>
+                <Text size={12} color="secondary">
+                  {session?.user.email ?? ""}
+                </Text>
+              </VStack>
+            </Section>
+          </Form>
+          <AppearanceSection />
+          <Section title="Admin">
+            <Link href="/admin">
+              <Button>
+                <SymbolView
+                  name="gear.badge"
+                  tintColor={AC.systemOrange}
+                  size={18}
+                />
+                <Text color="primary">Admin Panel</Text>
+              </Button>
+            </Link>
+          </Section>
+          <Button onPress={() => authClient.signOut()}>
+            <Text color={AC.systemRed.toString()}>Sign Out</Text>
+          </Button>
+        </Host>
+      </ScrollView>
     </>
   );
 }
@@ -97,14 +109,16 @@ function useOptimisticDarkMode() {
 function AppearanceSection() {
   const [darkMode, setDarkMode] = useOptimisticDarkMode();
   return (
-    <Form.Section title="Appearance">
-      <Form.Toggle
-        systemImage={{ name: darkMode ? "moon" : "sun.max" }}
-        value={darkMode}
-        onValueChange={(value) => setDarkMode(value ? "dark" : undefined)}
-      >
-        Always Dark
-      </Form.Toggle>
-    </Form.Section>
+    <Section title="Appearance">
+      <HStack spacing={8}>
+        <SymbolView name={darkMode ? "moon" : "sun.max"} />
+        <Text>Appearance</Text>
+        <Spacer />
+        <Switch
+          value={darkMode}
+          onValueChange={(value) => setDarkMode(value ? "dark" : undefined)}
+        />
+      </HStack>
+    </Section>
   );
 }

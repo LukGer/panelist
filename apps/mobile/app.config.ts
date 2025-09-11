@@ -94,17 +94,10 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         backgroundColor: "#ffffff",
       },
     ],
-    "react-native-bottom-tabs",
-    [
-      "expo-build-properties",
-      {
-        ios: {
-          useFrameworks: "static",
-        },
-      },
-    ],
     "expo-web-browser",
     "expo-secure-store",
+    "expo-font",
+    "expo-sqlite",
   ],
   experiments: {
     typedRoutes: true,
