@@ -1,9 +1,6 @@
-import { authClient } from "@/auth/client";
 import { useAuth } from "@/contexts/auth-context";
 import { useThemeColor } from "@/hooks/useThemeColor";
-import * as AC from "@bacons/apple-colors";
 import {
-  Button,
   Form,
   Host,
   HStack,
@@ -11,19 +8,23 @@ import {
   Spacer,
   Switch,
   Text,
+  Image as UIImage,
   VStack,
 } from "@expo/ui/swift-ui";
-import { glassEffect, padding } from "@expo/ui/swift-ui/modifiers";
+import { cornerRadius, frame } from "@expo/ui/swift-ui/modifiers";
 import { Image } from "expo-image";
-import { Link, Stack } from "expo-router";
-import { SymbolView } from "expo-symbols";
+import { Stack } from "expo-router";
 import { useState } from "react";
-import { Appearance, ScrollView } from "react-native";
+import { Appearance } from "react-native";
 
 export default function ProfileScreen() {
   const { session } = useAuth();
 
   const backgroundColor = useThemeColor({}, "background");
+
+  if (!session) {
+    return null;
+  }
 
   return (
     <>
@@ -31,45 +32,45 @@ export default function ProfileScreen() {
         options={{
           headerTitle: "Profile",
           headerLargeTitle: true,
+          headerTransparent: true,
           contentStyle: {
             backgroundColor: backgroundColor,
           },
         }}
       />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        contentContainerStyle={{ gap: 16 }}
-      >
-        <Host style={{ flex: 1 }}>
-          <Form>
-            <Section>
-              <VStack alignment="center">
-                {session?.user.image && (
-                  <Image source={{ uri: session?.user.image! }} />
-                )}
-                <Text
-                  size={24}
+
+      <Host matchContents style={{ flex: 1 }}>
+        <Form>
+          <Section>
+            <VStack
+              alignment="center"
+              spacing={8}
+              modifiers={[frame({ width: 999 })]}
+            >
+              {session.user.image && (
+                <HStack
                   modifiers={[
-                    padding({
-                      all: 16,
-                    }),
-                    glassEffect({
-                      glass: {
-                        variant: "clear",
-                      },
-                    }),
+                    frame({ width: 100, height: 100 }),
+                    cornerRadius(24),
                   ]}
                 >
-                  {session?.user.name ?? ""}
-                </Text>
-                <Text size={12} color="secondary">
-                  {session?.user.email ?? ""}
-                </Text>
-              </VStack>
-            </Section>
-          </Form>
+                  <Image
+                    source={{ uri: session?.user.image! }}
+                    style={{ width: 100, height: 100 }}
+                  />
+                </HStack>
+              )}
+              <Text size={24} design="rounded">
+                {session.user.name}
+              </Text>
+              <Text size={12} color="secondary">
+                {session.user.email}
+              </Text>
+            </VStack>
+          </Section>
           <AppearanceSection />
-          <Section title="Admin">
+        </Form>
+        {/* <Section title="Admin">
             <Link href="/admin">
               <Button>
                 <SymbolView
@@ -83,9 +84,8 @@ export default function ProfileScreen() {
           </Section>
           <Button onPress={() => authClient.signOut()}>
             <Text color={AC.systemRed.toString()}>Sign Out</Text>
-          </Button>
-        </Host>
-      </ScrollView>
+          </Button> */}
+      </Host>
     </>
   );
 }
@@ -111,8 +111,8 @@ function AppearanceSection() {
   return (
     <Section title="Appearance">
       <HStack spacing={8}>
-        <SymbolView name={darkMode ? "moon" : "sun.max"} />
-        <Text>Appearance</Text>
+        <UIImage systemName={darkMode ? "moon" : "sun.max"} />
+        <Text>Dark Mode</Text>
         <Spacer />
         <Switch
           value={darkMode}

@@ -1,12 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import React from "react";
-import {
-  Platform,
-  SafeAreaView,
-  Text,
-  useColorScheme,
-  View,
-} from "react-native";
+import { Platform, Text, useColorScheme, View } from "react-native";
 
 import { DatabaseProvider } from "@/components/database-provider";
 import LinkButton from "@/components/link-button";
@@ -20,18 +14,25 @@ import {
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import ErrorBoundary from "react-native-error-boundary";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const queryClient = new QueryClient();
 
 const ErrorFallbackComponent = () => {
+  const insets = useSafeAreaInsets();
   return (
-    <SafeAreaView>
-      <View>
-        <Text>Oops!</Text>
-        <Text>An unexpected error occured.</Text>
-        <LinkButton href="/login">Try again</LinkButton>
-      </View>
-    </SafeAreaView>
+    <View
+      style={{
+        paddingTop: insets.top,
+        paddingBottom: insets.bottom,
+        paddingLeft: insets.left,
+        paddingRight: insets.right,
+      }}
+    >
+      <Text>Oops!</Text>
+      <Text>An unexpected error occured.</Text>
+      <LinkButton href="/login">Try again</LinkButton>
+    </View>
   );
 };
 

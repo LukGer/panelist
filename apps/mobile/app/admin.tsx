@@ -1,8 +1,15 @@
 import { authClient } from "@/auth/client";
-import * as Form from "@/components/ui/form";
 import { useThemeColor } from "@/hooks/useThemeColor";
+import {
+  Host,
+  HStack,
+  Section,
+  Spacer,
+  Text,
+  TextField,
+} from "@expo/ui/swift-ui";
 import React, { useState } from "react";
-import { Button } from "react-native";
+import { Button, ScrollView } from "react-native";
 
 export default function Admin() {
   const { data: session } = authClient.useSession();
@@ -14,11 +21,9 @@ export default function Admin() {
   }
 
   return (
-    <Form.ScrollView
-      style={{ flex: 1, backgroundColor: bgColor, paddingBlock: 16 }}
-    >
+    <ScrollView style={{ flex: 1, backgroundColor: bgColor, paddingBlock: 16 }}>
       <ImpersonateUserForm />
-    </Form.ScrollView>
+    </ScrollView>
   );
 }
 
@@ -32,20 +37,23 @@ function ImpersonateUserForm() {
   };
 
   return (
-    <Form.Section title="Impersonate User">
-      <Form.HStack>
-        <Form.Text>User ID</Form.Text>
-        <Form.TextField
-          value={userId}
-          onChangeText={setUserId}
-          placeholder="User ID"
-        />
-      </Form.HStack>
+    <Host>
+      <Section title="Impersonate User">
+        <HStack>
+          <Text>User ID</Text>
+          <TextField
+            autocorrection={false}
+            defaultValue={userId}
+            onChangeText={setUserId}
+            placeholder="User ID"
+          />
+        </HStack>
 
-      <Form.HStack>
-        <Form.Spacer />
-        <Button onPress={handleImpersonate} title="Impersonate" />
-      </Form.HStack>
-    </Form.Section>
+        <HStack>
+          <Spacer />
+          <Button onPress={handleImpersonate} title="Impersonate" />
+        </HStack>
+      </Section>
+    </Host>
   );
 }

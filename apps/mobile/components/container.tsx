@@ -1,5 +1,4 @@
 import {
-  SafeAreaView,
   ScrollView,
   StyleProp,
   StyleSheet,
@@ -18,9 +17,7 @@ const Container = (props: ContainerProps) => (
     contentInsetAdjustmentBehavior="automatic"
     style={styles.scrollWrapper}
   >
-    <SafeAreaView>
-      <View style={[styles.container, props.style]}>{props.children}</View>
-    </SafeAreaView>
+    <View style={[styles.container, props.style]}>{props.children}</View>
   </ScrollView>
 );
 
