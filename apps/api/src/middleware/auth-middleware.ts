@@ -1,16 +1,13 @@
-import { env } from "cloudflare:workers";
 import { Context, Next } from "hono";
-import { getAuth } from "../auth";
+import { Resource } from "sst";
+import { auth } from "../auth";
 
 export type AuthContext = {
-  user: Awaited<ReturnType<typeof getAuth>>["$Infer"]["Session"]["user"] | null;
-  session:
-    | Awaited<ReturnType<typeof getAuth>>["$Infer"]["Session"]["session"]
-    | null;
+  user: (typeof auth)["$Infer"]["Session"]["user"] | null;
+  session: (typeof auth)["$Infer"]["Session"]["session"] | null;
 };
 
 export const authenticate = async (c: Context, next: Next) => {
-  const auth = getAuth(c.env);
   const session = await auth.api.getSession({
     headers: c.req.raw.headers,
   });
@@ -28,8 +25,7 @@ export const authenticateApiKey = async (c: Context, next: Next) => {
     return c.json({ error: "API key required" }, 401);
   }
 
-  // Check against environment variable
-  const validApiKey = env.CRON_API_KEY;
+  const validApiKey = Resource.Secret.CRON_API_KEY.value;
 
   if (!validApiKey || apiKey !== validApiKey) {
     return c.json({ error: "Invalid API key" }, 401);

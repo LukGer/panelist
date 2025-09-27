@@ -1,6 +1,5 @@
-import { env } from "cloudflare:workers";
+import { db } from "@/db/config";
 import { and, count, desc, eq, gte } from "drizzle-orm";
-import { getDb } from "../../database/config";
 import { jobLog, JobLog, NewJobLog } from "../../database/schema";
 
 export type JobStatus = "running" | "completed" | "failed" | "cancelled";
@@ -13,15 +12,10 @@ export interface JobResult {
 }
 
 export class JobService {
-  private static getDb() {
-    return getDb(env);
-  }
-
   /**
    * Start a new job and log it
    */
   static async startJob(jobName: string): Promise<string> {
-    const db = this.getDb();
     const newJob: NewJobLog = {
       jobName,
       status: "running",
@@ -42,7 +36,6 @@ export class JobService {
    * Complete a job successfully
    */
   static async completeJob(jobId: string, message?: string): Promise<void> {
-    const db = this.getDb();
     const startTime = await this.getJobStartTime(jobId);
     const duration = startTime ? this.calculateDuration(startTime) : null;
 
@@ -61,7 +54,6 @@ export class JobService {
    * Mark a job as failed
    */
   static async failJob(jobId: string, errorMessage: string): Promise<void> {
-    const db = this.getDb();
     const startTime = await this.getJobStartTime(jobId);
     const duration = startTime ? this.calculateDuration(startTime) : null;
 
@@ -80,7 +72,6 @@ export class JobService {
    * Cancel a running job
    */
   static async cancelJob(jobId: string, reason?: string): Promise<void> {
-    const db = this.getDb();
     const startTime = await this.getJobStartTime(jobId);
     const duration = startTime ? this.calculateDuration(startTime) : null;
 
@@ -99,7 +90,6 @@ export class JobService {
    * Get job details by ID
    */
   static async getJob(jobId: string): Promise<JobLog | null> {
-    const db = this.getDb();
     const [result] = await db
       .select()
       .from(jobLog)
@@ -116,7 +106,6 @@ export class JobService {
     jobName: string,
     limit: number = 10
   ): Promise<JobLog[]> {
-    const db = this.getDb();
     return await db
       .select()
       .from(jobLog)
@@ -129,7 +118,6 @@ export class JobService {
    * Get all running jobs
    */
   static async getRunningJobs(): Promise<JobLog[]> {
-    const db = this.getDb();
     return await db
       .select()
       .from(jobLog)
@@ -144,7 +132,6 @@ export class JobService {
     days: number = 7,
     jobName?: string
   ): Promise<JobLog[]> {
-    const db = this.getDb();
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 
@@ -175,7 +162,6 @@ export class JobService {
     failed: number;
     cancelled: number;
   }> {
-    const db = this.getDb();
     const baseQuery = jobName ? eq(jobLog.jobName, jobName) : undefined;
 
     const [total, running, completed, failed, cancelled] = await Promise.all([
@@ -211,7 +197,6 @@ export class JobService {
    * Clean up old job logs (older than N days)
    */
   static async cleanupOldJobs(daysToKeep: number = 30): Promise<number> {
-    const db = this.getDb();
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - daysToKeep);
 
@@ -227,7 +212,6 @@ export class JobService {
    * Check if a job is currently running
    */
   static async isJobRunning(jobName: string): Promise<boolean> {
-    const db = this.getDb();
     const [result] = await db
       .select({ count: count() })
       .from(jobLog)
@@ -240,7 +224,6 @@ export class JobService {
    * Get the start time of a job
    */
   private static async getJobStartTime(jobId: string): Promise<Date | null> {
-    const db = this.getDb();
     const [result] = await db
       .select({ startedAt: jobLog.startedAt })
       .from(jobLog)

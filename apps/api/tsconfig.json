@@ -1,14 +1,13 @@
 {
   "extends": "@panelist/typescript-config/base.json",
   "compilerOptions": {
-    "types": ["./worker-configuration.d.ts"],
-    "strict": true,
-    "jsx": "react-jsx",
-    "jsxImportSource": "hono/jsx",
+    "outDir": "./dist",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"],
-      "@/db/*": ["./database/*"]
-    }
+      "@/*": ["src/*"],
+      "@/db/*": ["database/*"]
+    },
+    "composite": true,
+    "incremental": true
   }
 }

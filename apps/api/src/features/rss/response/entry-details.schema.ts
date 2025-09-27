@@ -1,0 +1,32 @@
+import z from "zod";
+
+export const EntryDetailsResponseSchema = z.object({
+  id: z.uuid(),
+  feedId: z.uuid(),
+  title: z.string(),
+  link: z.string(),
+  description: z.string().nullable(),
+  isDescriptionHtml: z.boolean(),
+  summary: z.string().nullable(),
+  content: z.string().nullable(),
+  author: z.string().nullable(),
+  guid: z.string(),
+  pubDate: z.date().nullable(),
+  isRead: z.boolean(),
+  isBookmarked: z.boolean(),
+  thumbnailUrl: z.string().nullable(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+  feed: z.object({
+    id: z.uuid(),
+    title: z.string(),
+    url: z.string(),
+    description: z.string().nullable(),
+    siteUrl: z.string().nullable(),
+    faviconUrl: z.string().nullable(),
+    lastFetched: z.date().nullable(),
+    isActive: z.boolean(),
+    createdAt: z.date(),
+    updatedAt: z.date(),
+  }),
+});
